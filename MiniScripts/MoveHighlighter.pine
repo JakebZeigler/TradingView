@@ -1,0 +1,17 @@
+//@version=4
+study("Largest Range Bar Highlight", shorttitle="LRBH", overlay=true)
+
+// Input for adjusting the interval
+interval = input(5, minval=2, maxval=100000, title="Look Back Interval")
+
+// Calculate the range (high - low) of each bar
+barRange = high - low
+
+// Find the bar with the largest range in the last 'interval' bars
+largestRange = highest(barRange, interval)
+
+// Determine if the current bar has the largest range among the last 'interval' bars
+isLargestRangeBar = barRange == largestRange
+
+// Change the bar color to yellow if it has the largest range in the last 'interval' bars
+barcolor(isLargestRangeBar ? color.white : na)
