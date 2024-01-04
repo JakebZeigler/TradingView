@@ -1,0 +1,38 @@
+//@version=2
+study("TrendAlert", overlay=false)
+
+// Trend and direction determination Step 1 en Step 2 method conform ZoneRecovery from 4x-dat.com Joseph Nemeth 
+// https://www.youtube.com/watch?v=YxDAYtlQjBM
+// step 1 LongTerm timefram/resolution (LT) determine general direction 
+//•	color last Heikenahsi bar gives is the general direction 
+// step 2 MidTerm timeframe/resolution determine trend
+//•	color last Heikenahsi bar must match Direction step 1 and
+//•	slope of 20EMA in direction step 1 and 
+//•	price relation to EMA20: above = up, below=down 
+// Step 1 AND step 2 => TrendAlert (-1 for Short, 1 for Long, 0 for No trend)
+
+//Heiken Ashi Candles
+data = heikenashi(tickerid)
+resLT = input(title="Res LT", type=resolution, defval="D")
+resMT = input(title="Res MT", type=resolution, defval="240")
+
+
+LTo = security(data, resLT, open)
+LTc = security(data, resLT, close)
+MTo = security(data, resMT, open)
+MTc = security(data, resMT, close)
+
+LTlong = LTc > LTo 
+LTshort = LTc < LTo 
+MTema20 = ema(MTc,20)
+MTema20delta= change(MTema20)
+
+MTlong = MTc > MTo and MTc > MTema20 and MTema20delta > 0
+MTshort = MTc < MTo and MTc < MTema20 and MTema20delta < 0
+
+
+
+Long = MTlong and LTlong
+Short = MTshort and LTshort
+
+plot(Long ? 1 : Short ? -1: 0, title="TrendAlert", color= Long ? lime : Short ? red : gray, style=columns )
